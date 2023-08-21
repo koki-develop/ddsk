@@ -8,7 +8,8 @@ import (
 )
 
 var (
-	flagColor bool
+	flagColor   bool
+	flagAnimate bool
 )
 
 var rootCmd = &cobra.Command{
@@ -16,7 +17,10 @@ var rootCmd = &cobra.Command{
 	Args: cobra.ExactArgs(0),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		w := cmd.OutOrStdout()
-		ddsk := ddsk.New(&ddsk.Config{Color: flagColor})
+		ddsk := ddsk.New(&ddsk.Config{
+			Color:   flagColor,
+			Animate: flagAnimate,
+		})
 
 		if err := ddsk.Run(w); err != nil {
 			return err
@@ -35,4 +39,5 @@ func Execute() {
 
 func init() {
 	rootCmd.PersistentFlags().BoolVarP(&flagColor, "color", "c", false, "colorize output")
+	rootCmd.PersistentFlags().BoolVarP(&flagAnimate, "animate", "a", false, "animate output")
 }

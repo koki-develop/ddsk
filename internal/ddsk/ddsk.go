@@ -18,7 +18,8 @@ const (
 )
 
 type Config struct {
-	Color bool
+	Color   bool
+	Animate bool
 }
 
 type DDSK struct {
