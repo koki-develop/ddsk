@@ -16,13 +16,19 @@ const (
 	targetLen    = len(target) * targetRepeat
 )
 
-type DDSK struct{}
-
-func New() *DDSK {
-	return &DDSK{}
+type Config struct {
+	Color bool
 }
 
-func (*DDSK) Run(w io.Writer) error {
+type DDSK struct {
+	config *Config
+}
+
+func New(cfg *Config) *DDSK {
+	return &DDSK{config: cfg}
+}
+
+func (d *DDSK) Run(w io.Writer) error {
 	cur := new(strings.Builder)
 
 	for {
