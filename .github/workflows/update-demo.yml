@@ -17,6 +17,8 @@ jobs:
       - name: Install ddsk
         run: go install .
 
+      - name: Install fonts
+        run: sudo apt-get install fonts-ipafont-gothic fonts-ipafont-mincho
       - name: Update demo.gif
         uses: charmbracelet/vhs-action@v2
         with:
@@ -27,7 +29,7 @@ jobs:
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          title: update docs
+          title: Update demo.gif
           body: ${{ github.sha }}
           branch: docs/update
           branch-suffix: short-commit-hash
