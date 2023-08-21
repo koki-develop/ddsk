@@ -1,4 +1,4 @@
-<h1 align="center">ddsk CLI</h1>
+<h1 align="center">🩷 ddsk CLI</h1>
 
 <p align="center">
 <a href="https://github.com/koki-develop/ddsk/releases/latest"><img src="https://img.shields.io/github/v/release/koki-develop/ddsk" alt="GitHub release (latest by date)"></a>
@@ -10,15 +10,13 @@
 </p>
 
 <p align="center">
-Love Injection
+Love Injection<br/>
+Inspired by: <a href="https://twitter.com/Sheeeeepla/status/1554028833942441984">@Sheeeeepla</a>
 </p>
 
 <p align="center">
 <img src="./assets/demo.gif" >
 </p>
-
-> **Note**
-> Inspired by: [@Sheeeeepla](https://twitter.com/Sheeeeepla/status/1554028833942441984)
 
 ## Contents
 
