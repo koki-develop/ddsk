@@ -5,16 +5,18 @@ import (
 	"io"
 	"math/rand"
 	"strings"
+	"time"
 )
 
 const (
-	dd   = "ドド"
-	sk   = "スコ"
-	love = "ラブ注入♡\n"
+	dd      = "ドド"
+	sk      = "スコ"
+	love    = "ラブ"
+	inject1 = "注"
+	inject2 = "入"
+	heart   = "♡"
 
-	target       = dd + sk + sk + sk
-	targetRepeat = 3
-	targetLen    = len(target) * targetRepeat
+	ddsksksk = dd + sk + sk + sk
 )
 
 type Config struct {
@@ -30,20 +32,21 @@ func New(cfg *Config) *DDSK {
 	return &DDSK{config: cfg}
 }
 
+// TODO: refactor
 func (d *DDSK) Run(w io.Writer) error {
 	cur := new(bytes.Buffer)
 
 	for {
 		next := d.choose()
-		if !d.config.Color {
+		if !d.config.Color && !d.config.Animate {
 			if _, err := w.Write([]byte(next)); err != nil {
 				return err
 			}
 		}
 
 		cur.WriteString(next)
-		if cur.Len() > targetLen {
-			if d.config.Color {
+		if cur.Len() > len(ddsksksk)*3 {
+			if d.config.Color || d.config.Animate {
 				if _, err := io.Copy(w, cur); err != nil {
 					return err
 				}
@@ -52,33 +55,15 @@ func (d *DDSK) Run(w io.Writer) error {
 			continue
 		}
 
-		if cur.String() == strings.Repeat(target, targetRepeat) {
-			if d.config.Color {
-				rainbowColors := []string{"\x1b[31m", "\x1b[32m", "\x1b[33m", "\x1b[34m", "\x1b[35m", "\x1b[36m"}
+		if cur.String() == strings.Repeat(ddsksksk, 3) {
+			if d.config.Color || d.config.Animate {
+				if err := d.ddsk(w); err != nil {
+					return err
+				}
+			}
 
-				for i, c := range []rune(cur.String()) {
-					if _, err := w.Write([]byte(rainbowColors[i%len(rainbowColors)])); err != nil {
-						return err
-					}
-					if _, err := w.Write([]byte(string(c))); err != nil {
-						return err
-					}
-				}
-
-				if _, err := w.Write([]byte("\x1b[1m\x1b[91m")); err != nil {
-					return err
-				}
-				if _, err := w.Write([]byte(love)); err != nil {
-					return err
-				}
-
-				if _, err := w.Write([]byte("\x1b[0m")); err != nil {
-					return err
-				}
-			} else {
-				if _, err := w.Write([]byte(love)); err != nil {
-					return err
-				}
+			if err := d.injectLove(w); err != nil {
+				return err
 			}
 			break
 		}
@@ -92,4 +77,68 @@ func (*DDSK) choose() string {
 		return dd
 	}
 	return sk
+}
+
+func (d *DDSK) injectLove(w io.Writer) error {
+	if !d.config.Color && !d.config.Animate {
+		if _, err := w.Write([]byte(love + inject1 + inject2 + heart)); err != nil {
+			return err
+		}
+		return nil
+	}
+
+	if d.config.Color {
+		if _, err := w.Write([]byte("\x1b[1m\x1b[91m")); err != nil {
+			return err
+		}
+	}
+
+	for _, s := range []string{love, inject1, inject2 + heart} {
+		if _, err := w.Write([]byte(s)); err != nil {
+			return err
+		}
+		if d.config.Animate {
+			time.Sleep(400 * time.Millisecond)
+		}
+	}
+
+	if d.config.Color {
+		if _, err := w.Write([]byte("\x1b[0m")); err != nil {
+			return err
+		}
+	}
+
+	if _, err := w.Write([]byte("\n")); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (d *DDSK) ddsk(w io.Writer) error {
+	colors := []string{"\x1b[31m", "\x1b[32m", "\x1b[33m", "\x1b[34m", "\x1b[35m", "\x1b[36m"}
+
+	for i, c := range []rune(strings.Repeat(ddsksksk, 3)) {
+		if d.config.Color {
+			if _, err := w.Write([]byte(colors[i%len(colors)])); err != nil {
+				return err
+			}
+		}
+
+		if _, err := w.Write([]byte(string(c))); err != nil {
+			return err
+		}
+
+		if d.config.Animate {
+			time.Sleep(200 * time.Millisecond)
+		}
+	}
+
+	if d.config.Color {
+		if _, err := w.Write([]byte("\x1b[0m")); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
