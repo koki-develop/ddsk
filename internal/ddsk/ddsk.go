@@ -9,17 +9,18 @@ import (
 )
 
 const (
-	dd      = "ドド"
-	sk      = "スコ"
-	love    = "ラブ"
-	inject1 = "注"
-	inject2 = "入"
-	heart   = "♡"
-
+	dd       = "ドド"
+	sk       = "スコ"
+	love     = "ラブ"
+	inject1  = "注"
+	inject2  = "入"
+	heart    = "♡"
 	ddsksksk = dd + sk + sk + sk
 )
 
 type Config struct {
+	Writer io.Writer
+
 	Color   bool
 	Animate bool
 }
@@ -32,87 +33,77 @@ func New(cfg *Config) *DDSK {
 	return &DDSK{config: cfg}
 }
 
-// TODO: refactor
-func (d *DDSK) Run(w io.Writer) error {
+func (d *DDSK) Run() error {
 	cur := new(bytes.Buffer)
 
 	for {
-		next := d.choose()
-		if !d.config.Color && !d.config.Animate {
-			if _, err := w.Write([]byte(next)); err != nil {
-				return err
-			}
-		}
-
-		cur.WriteString(next)
-		if cur.Len() > len(ddsksksk)*3 {
-			if d.config.Color || d.config.Animate {
-				if _, err := io.Copy(w, cur); err != nil {
-					return err
-				}
-			}
-			cur.Reset()
-			continue
+		if err := d.generateAndWriteSequence(cur); err != nil {
+			return err
 		}
 
 		if cur.String() == strings.Repeat(ddsksksk, 3) {
-			if d.config.Color || d.config.Animate {
-				if err := d.ddsk(w); err != nil {
-					return err
-				}
+			if err := d.generateColoredOrAnimatedString(d.ddsk); err != nil {
+				return err
 			}
 
-			if err := d.injectLove(w); err != nil {
+			if err := d.injectLove(); err != nil {
 				return err
 			}
 			break
 		}
 	}
 
+	if _, err := d.config.Writer.Write([]byte("\n")); err != nil {
+		return err
+	}
+
 	return nil
 }
 
-func (*DDSK) choose() string {
+func (d *DDSK) generateAndWriteSequence(cur *bytes.Buffer) error {
+	next := d.choose()
+	cur.WriteString(next)
+
+	if cur.Len() > len(ddsksksk)*3 {
+		return d.flushBuffer(cur)
+	}
+	return nil
+}
+
+func (d *DDSK) flushBuffer(cur *bytes.Buffer) error {
+	if _, err := io.Copy(d.config.Writer, cur); err != nil {
+		return err
+	}
+	cur.Reset()
+	return nil
+}
+
+func (d *DDSK) choose() string {
 	if rand.Intn(2) == 0 {
 		return dd
 	}
 	return sk
 }
 
-func (d *DDSK) injectLove(w io.Writer) error {
-	if !d.config.Color && !d.config.Animate {
-		if _, err := w.Write([]byte(love + inject1 + inject2 + heart)); err != nil {
-			return err
+func (d *DDSK) injectLove() error {
+	return d.generateColoredOrAnimatedString(func(w io.Writer) error {
+		if d.config.Color {
+			if _, err := w.Write([]byte("\x1b[1m")); err != nil {
+				return err
+			}
 		}
+
+		for _, s := range []string{love, inject1, inject2 + heart} {
+			if _, err := w.Write([]byte(s)); err != nil {
+				return err
+			}
+			if d.config.Animate {
+				time.Sleep(400 * time.Millisecond)
+			}
+		}
+
 		return nil
-	}
-
-	if d.config.Color {
-		if _, err := w.Write([]byte("\x1b[1m\x1b[91m")); err != nil {
-			return err
-		}
-	}
-
-	for _, s := range []string{love, inject1, inject2 + heart} {
-		if _, err := w.Write([]byte(s)); err != nil {
-			return err
-		}
-		if d.config.Animate {
-			time.Sleep(400 * time.Millisecond)
-		}
-	}
-
-	if d.config.Color {
-		if _, err := w.Write([]byte("\x1b[0m")); err != nil {
-			return err
-		}
-	}
-
-	if _, err := w.Write([]byte("\n")); err != nil {
-		return err
-	}
-
-	return nil
+	})
 }
 
 func (d *DDSK) ddsk(w io.Writer) error {
@@ -134,8 +125,22 @@ func (d *DDSK) ddsk(w io.Writer) error {
 		}
 	}
 
+	return nil
+}
+
+func (d *DDSK) generateColoredOrAnimatedString(generator func(io.Writer) error) error {
 	if d.config.Color {
-		if _, err := w.Write([]byte("\x1b[0m")); err != nil {
+		if _, err := d.config.Writer.Write([]byte("\x1b[91m")); err != nil {
+			return err
+		}
+	}
+
+	if err := generator(d.config.Writer); err != nil {
+		return err
+	}
+
+	if d.config.Color {
+		if _, err := d.config.Writer.Write([]byte("\x1b[0m")); err != nil {
 			return err
 		}
 	}

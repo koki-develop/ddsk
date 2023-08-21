@@ -16,13 +16,13 @@ var rootCmd = &cobra.Command{
 	Use:  "ddsk",
 	Args: cobra.ExactArgs(0),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		w := cmd.OutOrStdout()
 		ddsk := ddsk.New(&ddsk.Config{
+			Writer:  cmd.OutOrStdout(),
 			Color:   flagColor,
 			Animate: flagAnimate,
 		})
 
-		if err := ddsk.Run(w); err != nil {
+		if err := ddsk.Run(); err != nil {
 			return err
 		}
 
