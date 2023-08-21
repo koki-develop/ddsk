@@ -1,0 +1,33 @@
+name: Update demo
+
+on:
+  workflow_dispatch:
+
+jobs:
+  update-demo:
+    permissions:
+      contents: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup
+        uses: ./.github/actions/setup
+      - name: Install ddsk
+        run: go install .
+
+      - name: Update demo.gif
+        uses: charmbracelet/vhs-action@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: ./tapes/demo.tape
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: update docs
+          body: ${{ github.sha }}
+          branch: docs/update
+          branch-suffix: short-commit-hash
