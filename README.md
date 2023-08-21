@@ -2,7 +2,6 @@
 
 <p align="center">
 <a href="https://github.com/koki-develop/ddsk/releases/latest"><img src="https://img.shields.io/github/v/release/koki-develop/ddsk" alt="GitHub release (latest by date)"></a>
-<a href="https://github.com/koki-develop/ddsk/releases/latest"><img alt="GitHub all releases" src="https://img.shields.io/github/downloads/koki-develop/ddsk/total?style=flat"></a>
 <a href="https://github.com/koki-develop/ddsk/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/koki-develop/ddsk/ci.yml?logo=github" alt="GitHub Workflow Status"></a>
 <a href="https://codeclimate.com/github/koki-develop/ddsk/maintainability"><img src="https://img.shields.io/codeclimate/maintainability/koki-develop/ddsk?style=flat&amp;logo=codeclimate" alt="Maintainability"></a>
 <a href="https://goreportcard.com/report/github.com/koki-develop/ddsk"><img src="https://goreportcard.com/badge/github.com/koki-develop/ddsk" alt="Go Report Card"></a>
