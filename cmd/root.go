@@ -13,8 +13,9 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:  "ddsk",
-	Args: cobra.ExactArgs(0),
+	Use:   "ddsk",
+	Short: "Love Injection",
+	Args:  cobra.ExactArgs(0),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ddsk := ddsk.New(&ddsk.Config{
 			Writer:  cmd.OutOrStdout(),
