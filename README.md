@@ -1,4 +1,4 @@
-<h1 align="center">🩷 ddsk CLI</h1>
+<h1 align="center">❤️ ddsk CLI</h1>
 
 <p align="center">
 <a href="https://github.com/koki-develop/ddsk/releases/latest"><img src="https://img.shields.io/github/v/release/koki-develop/ddsk" alt="GitHub release (latest by date)"></a>
